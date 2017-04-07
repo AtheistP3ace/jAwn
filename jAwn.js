@@ -1071,7 +1071,7 @@
     };
 
     // Remove an element or array of elements from the DOM, this will off all events and remove cache
-    jAwn.RemoveElement = function (elements, ignoreData, ignoreDelegatedData) {
+    jAwn.RemoveElements = function (elements, ignoreData) {
 
         // Initialize and sanity check
         var removedChildren = []
@@ -1095,7 +1095,7 @@
 
                 // Merge top element back in for clean up
                 childElements = MergeArray([element], childElements);
-                Cache.CleanElementData(childElements, ignoreDelegatedData);
+                Cache.CleanElementData(childElements);
             }
             if (IsDefined(element.parentNode)) {
                 removedChild = element.parentNode.removeChild(element);
@@ -1103,6 +1103,13 @@
             }
         }
         return removedChildren;
+
+    };
+
+    // Removes element or array of elements from DOM but does not clean up events or data associated with them
+    jAwn.Detach = function (elements) {
+
+        return Common.Remove(elements, true);
 
     };
 
