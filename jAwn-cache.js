@@ -33,7 +33,7 @@
     // Data Cache Definition
     function Data () {
 
-        this.CacheKey = 'GTCCache3.0' + Data.Guid++;
+        this.CacheKey = 'jAwnCache3.0' + Data.Guid++;
 
     };
     Data.Guid = 1;
@@ -209,7 +209,7 @@
     };
 
     // TODO: Test performance
-    // Called from Common.Remove among other places to cleanup data and events on elements
+    // Called from jAwn.RemoveElement to cleanup data and events on elements prior to removal from DOM
     Cache.CleanElementData = function (elements) {
 
         // Convert elements to an array, if necessary.
