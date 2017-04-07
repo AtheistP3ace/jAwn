@@ -217,7 +217,7 @@
             elements = [elements];
         }
         var data, element, type, index = 0;
-        var eventInternal = Events.GetInternal();
+        var eventInternal = jAwn.GetInternal();
         var special = eventInternal.special;
 
         // For each element destroy widgets, remove events and delete any remaining data
@@ -228,7 +228,7 @@
                     try {
                         // Only trigger remove when necessary to save time
                         if (data.events.remove) {
-                            Events.TriggerHandler(element, 'remove');
+                            jAwn.TriggerHandler(element, 'remove');
                         }
                     } catch (e) {}
 
@@ -238,7 +238,7 @@
                             eventInternal.remove(element, type);
                         }
                         else {
-                            // Shortcut to avoid Events.event.remove's overhead
+                            // Shortcut to avoid jAwn.event.remove's overhead
                             if (element.removeEventListener) {
                                 element.removeEventListener(type, data.handle);
                             }
