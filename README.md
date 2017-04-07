@@ -9,7 +9,8 @@ _noun `US` dialect_
 
 _Everything jQuery events offers without all the jQuery._
 
-If you aren't using the min make sure you include jAwn-cache.js before jAwn.js
+If you aren't using the min make sure you include jAwn-cache.js before jAwn.js.
+
 Base documentation exists below. Most likely if you can do it with jQuery events you can do it with jAwn. The only difference is the first argument is your elements. Enjoy!
 
 ### jAwn.On( elements, events [, selector ] [, data ], handler )
