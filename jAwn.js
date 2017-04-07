@@ -1,4 +1,4 @@
-(function (jAwn, window, document, Common, Cache, undefined) {
+(function (jAwn, window, document, Cache, undefined) {
 
     // Private Variables
     var EventGUID = 0;
@@ -1315,4 +1315,4 @@
 
     };
 
-} (window.jAwn = window.jAwn || {}, window, document, Common, Cache));
+} (window.jAwn = window.jAwn || {}, window, document, Cache));

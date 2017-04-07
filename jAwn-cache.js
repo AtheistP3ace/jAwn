@@ -1,5 +1,5 @@
 // Cache
-(function (Cache, window, document, Common, undefined) {
+(function (Cache, window, document, undefined) {
 
     // Private Variables
     var rnotwhite = (/\S+/g);
@@ -264,4 +264,4 @@
 
     };
 
-} (window.Cache = window.Cache || {}, window, document, Common));
+} (window.Cache = window.Cache || {}, window, document));
