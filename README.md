@@ -81,3 +81,7 @@ As with `jAwn.On()`, you can pass events as an object instead of specifying an e
 ### jAwn.One( elements, events [, selector ] [, data ] )
 
 The jAwn.One() method is identical to jAwn.On(), except that the handler for a given element and event type is unbound after its first invocation.
+
+### jAwn.RemoveElements( elements )
+
+Use `jAwn.RemoveElements()` when you want to remove the element itself, as well as everything inside it. In addition to the elements themselves, all bound events and data associated with the elements are removed. To remove the elements without removing data and events, use `jAwn.Detach()` instead.
