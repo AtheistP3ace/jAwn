@@ -9,6 +9,8 @@ _noun `US` dialect_
 
 _Everything jQuery events offers without all the jQuery._
 
+I put this together for myself so I could get all the great stuff jQuery gives you for events but I didn't want to include jQuery. I decided to throw it on here just in case someone else found it useful.
+
 If you aren't using the min make sure you include jAwn-cache.js before jAwn.js.
 
 Base documentation exists below. Most likely if you can do it with jQuery events you can do it with jAwn. The only difference is the first argument is your elements. Enjoy!
