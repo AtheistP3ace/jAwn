@@ -7,7 +7,7 @@
 _noun `US` dialect_
 > (chiefly in eastern Pennsylvania) used to refer to a thing, place, person, or **event** that one need not or cannot give a specific name to.
 
-_Everything jQuery events offers without all the jQuery._
+A JavaScript event library. _Everything jQuery events offers without all the jQuery._
 
 I put this together for myself so I could get all the great stuff jQuery gives you for events but I didn't want to include jQuery. I decided to throw it on here just in case someone else found it useful.
 
