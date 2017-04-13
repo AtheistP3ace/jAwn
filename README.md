@@ -15,16 +15,16 @@ If you aren't using the min make sure you include jAwn-cache.js before jAwn.js.
 
 Base documentation exists below. Most likely if you can do it with jQuery events you can do it with jAwn. The only difference is the first argument is your elements. The only exception are custom events **defined** by jQuery, like _ajaxStart_, _ajaxEnd_, etc... Enjoy!
 
-### jAwn.On( elements, events [, selector ] [, data ], handler )
-### jAwn.On( elements, events [, selector ] [, data ] )
+### jAwn.on( elements, events [, selector ] [, data ], handler )
+### jAwn.on( elements, events [, selector ] [, data ] )
 
 ### Event names and namespaces
 
-Any event names can be used for the events argument. jAwn will pass through the browser's standard JavaScript event types, calling the handler function when the browser generates events due to user actions such as click. In addition, the `jAwn.Trigger()` method can trigger both standard browser event names and custom event names to call attached handlers. Event names should only contain alphanumerics, underscore, and colon characters.
+Any event names can be used for the events argument. jAwn will pass through the browser's standard JavaScript event types, calling the handler function when the browser generates events due to user actions such as click. In addition, the `jAwn.trigger()` method can trigger both standard browser event names and custom event names to call attached handlers. Event names should only contain alphanumerics, underscore, and colon characters.
 
-An event name can be qualified by event namespaces that simplify removing or triggering the event. For example, "`click.myPlugin.simple"` defines both the myPlugin and simple namespaces for this particular click event. A click event handler attached via that string could be removed with `jAwn.Off(elements, "click.myPlugin")` or `jAwn.Off(elements, "click.simple")` without disturbing other click handlers attached to the elements. Namespaces are similar to CSS classes in that they are not hierarchical; only one name needs to match. 
+An event name can be qualified by event namespaces that simplify removing or triggering the event. For example, "`click.myPlugin.simple"` defines both the myPlugin and simple namespaces for this particular click event. A click event handler attached via that string could be removed with `jAwn.off(elements, "click.myPlugin")` or `jAwn.off(elements, "click.simple")` without disturbing other click handlers attached to the elements. Namespaces are similar to CSS classes in that they are not hierarchical; only one name needs to match. 
 
-In the second form of `jAwn.On()`, the events argument is a plain object. The keys are strings in the same form as the events argument with space-separated event type names and optional namespaces. The value for each key is a function (or false value) that is used as the handler instead of the final argument to the method. In other respects, the two forms are identical in their behavior as described below.
+In the second form of `jAwn.on()`, the events argument is a plain object. The keys are strings in the same form as the events argument with space-separated event type names and optional namespaces. The value for each key is a function (or false value) that is used as the handler instead of the final argument to the method. In other respects, the two forms are identical in their behavior as described below.
 
 ### Direct and delegated events
 
@@ -34,7 +34,7 @@ If `selector` is omitted or is null, the event handler is referred to as _direct
 
 When a `selector` is provided, the event handler is referred to as _delegated_. The handler is not called when the event occurs directly on the bound element, but only for descendants (inner elements) that match the selector. jAwn bubbles the event from the event target up to the element where the handler is attached (i.e., innermost to outermost element) and runs the handler for any elements along that path matching the selector.
 
-**Event handlers are bound only to the currently selected elements; they must exist at the time your code makes the call to `jAwn.On()`.** To ensure the elements are present and can be selected, place scripts after the elements in the HTML markup or perform event binding inside a document ready handler. Alternatively, use delegated events to attach event handlers.
+**Event handlers are bound only to the currently selected elements; they must exist at the time your code makes the call to `jAwn.on()`.** To ensure the elements are present and can be selected, place scripts after the elements in the HTML markup or perform event binding inside a document ready handler. Alternatively, use delegated events to attach event handlers.
 
 **Delegated events** have the advantage that they can process events from _descendant elements_ that are added to the document at a later time. By picking an element that is guaranteed to be present at the time the delegated event handler is attached, you can use delegated events to avoid the need to frequently attach and remove event handlers. This element could be the container element of a view in a Model-View-Controller design, for example, or `document` if the event handler wants to monitor all bubbling events in the document. The `document` element is available in the `head` of the document before loading any other HTML, so it is safe to attach events there without waiting for the document to be ready.
 
@@ -44,9 +44,9 @@ In addition to their ability to handle events on descendant elements not yet cre
 
 ### The event handler and its environment
 
-The `handler` argument is a function (or the value `false`, see below), and is required unless you pass an object for the `events` argument. You can provide an anonymous handler function at the point of the `jAwn.On()` call or declare a named function and pass its name.
+The `handler` argument is a function (or the value `false`, see below), and is required unless you pass an object for the `events` argument. You can provide an anonymous handler function at the point of the `jAwn.on()` call or declare a named function and pass its name.
 
-When the browser triggers an event or other JavaScript calls jAwn's .Trigger() method, jAwn passes the handler an Event object it can use to analyze and change the status of the event. This object is a normalized subset of data provided by the browser; the browser's unmodified native event object is available in event.originalEvent. For example, event.type contains the event name (e.g., "resize") and event.target indicates the deepest (innermost) element where the event occurred.
+When the browser triggers an event or other JavaScript calls jAwn's .trigger() method, jAwn passes the handler an Event object it can use to analyze and change the status of the event. This object is a normalized subset of data provided by the browser; the browser's unmodified native event object is available in event.originalEvent. For example, event.type contains the event name (e.g., "resize") and event.target indicates the deepest (innermost) element where the event occurred.
 
 By default, most events bubble up from the original event target to the document element. At each element along the way, jAwn calls any matching event handlers that have been attached. A handler can prevent the event from bubbling further up the document tree (and thus prevent handlers on those elements from running) by calling event.stopPropagation(). Any other handlers attached on the current element will run however. To prevent that, call event.stopImmediatePropagation(). (Event handlers bound to an element are called in the same order that they were bound.)
 
@@ -62,28 +62,28 @@ If a data argument is provided to jAwn.On() and is not `null` or `undefined`, it
 
 The same event handler can be bound to an element multiple times. This is especially useful when the event.data feature is being used, or when other unique data resides in a closure around the event handler function.
 
-As an alternative or in addition to the data argument provided to the `jAwn.On()` method, you can also pass data to an event handler using a second argument to `jAwn.Trigger()` or `jAwn.TriggerHandler()`. Data provided this way is passed to the event handler as further parameters after the Event object. If an array was passed to the second argument of `jAwn.Trigger()` or `jAwn.TriggerHandler()`, each element in the array will be presented to the event handler as an individual parameter.
+As an alternative or in addition to the data argument provided to the `jAwn.on()` method, you can also pass data to an event handler using a second argument to `jAwn.trigger()` or `jAwn.triggerHandler()`. Data provided this way is passed to the event handler as further parameters after the Event object. If an array was passed to the second argument of `jAwn.trigger()` or `jAwn.triggerHandler()`, each element in the array will be presented to the event handler as an individual parameter.
 
-### jAwn.Off( elements, events [, selector ] [, handler ] )
-### jAwn.Off( elements, events [, selector ] )
-### jAwn.Off( elements, event )
+### jAwn.off( elements, events [, selector ] [, handler ] )
+### jAwn.off( elements, events [, selector ] )
+### jAwn.off( elements, event )
 
-The `jAwn.Off()` method removes event handlers that were attached with `jAwn.On()`. Calling `jAwn.Off()` with no arguments removes all handlers attached to the elements. Specific event handlers can be removed on elements by providing combinations of event names, namespaces, selectors, or handler function names. When multiple filtering arguments are given, all of the arguments provided must match for the event handler to be removed.
+The `jAwn.off()` method removes event handlers that were attached with `jAwn.on()`. Calling `jAwn.off()` with no arguments removes all handlers attached to the elements. Specific event handlers can be removed on elements by providing combinations of event names, namespaces, selectors, or handler function names. When multiple filtering arguments are given, all of the arguments provided must match for the event handler to be removed.
 
 If a simple event name such as "click" is provided, all events of that type (both direct and delegated) are removed from the elements. When writing code best practice is to attach and remove events using namespaces so that the code will not inadvertently remove event handlers attached by other code. All events of all types in a specific namespace can be removed from an element by providing just a namespace, such as `".myPlugin"`. At minimum, either a namespace or event name must be provided.
 
-To remove specific delegated event handlers, provide a selector argument. The selector string must exactly match the one passed to `jAwn.On()` when the event handler was attached. To remove all delegated events from an element without removing non-delegated events, use the special value `"**"`.
+To remove specific delegated event handlers, provide a selector argument. The selector string must exactly match the one passed to `jAwn.on()` when the event handler was attached. To remove all delegated events from an element without removing non-delegated events, use the special value `"**"`.
 
 A handler can also be removed by specifying the function name in the handler argument. When jAwn attaches an event handler, it assigns a unique id to the handler function.
 
-As with `jAwn.On()`, you can pass events as an object instead of specifying an events string and handler function as separate arguments. The keys for the events object are events and/or namespaces; the values are handler functions or the special value `false`.
+As with `jAwn.on()`, you can pass events as an object instead of specifying an events string and handler function as separate arguments. The keys for the events object are events and/or namespaces; the values are handler functions or the special value `false`.
 
-### jAwn.One( elements, events [, data ], handler )
-### jAwn.One( elements, events [, selector ] [, data ], handler )
-### jAwn.One( elements, events [, selector ] [, data ] )
+### jAwn.one( elements, events [, data ], handler )
+### jAwn.one( elements, events [, selector ] [, data ], handler )
+### jAwn.one( elements, events [, selector ] [, data ] )
 
-The jAwn.One() method is identical to jAwn.On(), except that the handler for a given element and event type is unbound after its first invocation.
+The jAwn.one() method is identical to jAwn.on(), except that the handler for a given element and event type is unbound after its first invocation.
 
-### jAwn.RemoveElements( elements )
+### jAwn.removeElements( elements )
 
-Use `jAwn.RemoveElements()` when you want to remove the element itself, as well as everything inside it. In addition to the elements themselves, all bound events and data associated with the elements are removed. To remove the elements without removing data and events, use `jAwn.Detach()` instead.
+Use `jAwn.removeElements()` when you want to remove the element itself, as well as everything inside it. In addition to the elements themselves, all bound events and data associated with the elements are removed. To remove the elements without removing data and events, use `jAwn.detach()` instead.
