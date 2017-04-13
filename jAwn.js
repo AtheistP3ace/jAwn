@@ -177,7 +177,7 @@
     var dataCache = new Data();
 
     // Public Methods
-	jAwn.cache = {};
+    jAwn.cache = {};
     jAwn.cache.get = function (element, key) {
 
         return dataCache.get(element, key);
@@ -438,7 +438,7 @@
                 // (avoids potential for endless recursion during removal of special event handlers)
                 if (origCount && !handlers.length) {
                     if (!special.teardown || special.teardown.call(elem, namespaces, elemData.handle) === false) {
-                        jAwn.removeEvent(elem, type, elemData.handle);
+                        removeEvent(elem, type, elemData.handle);
                     }
                     delete events[type];
                 }
@@ -497,7 +497,7 @@
             // Allow special events to draw outside the lines
             special = eventInternal.special[type] || {};
             if (!onlyHandlers && special.trigger && special.trigger.apply(elem, data) === false) {
-                return;
+                return
             }
 
             // Determine event propagation path in advance, per W3C events spec (#9951)
@@ -857,8 +857,7 @@
 
     };
 
-    // Public Methods
-    jAwn.removeEvent = function (elem, type, handle) {
+    function removeEvent (elem, type, handle) {
 
         if (elem.removeEventListener) {
             elem.removeEventListener(type, handle, false);
@@ -866,6 +865,7 @@
 
     };
 
+    // Public Methods
     jAwn.on = function (elements, types, selector, data, fn, one) {
 
         var origFn, type;
@@ -1231,12 +1231,12 @@
         }
     }
 
-	// Functions and stuff
+    // Functions and stuff
 
     // Retrieve elements with a selector, optional context
     function queryAll (selector, context) {
 
-		// Determine if context was not passed in
+        // Determine if context was not passed in
         if (isNotDefined(context)) {
             context = document;
         }
