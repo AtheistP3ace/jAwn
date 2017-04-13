@@ -46,19 +46,19 @@ In addition to their ability to handle events on descendant elements not yet cre
 
 The `handler` argument is a function (or the value `false`, see below), and is required unless you pass an object for the `events` argument. You can provide an anonymous handler function at the point of the `jAwn.on()` call or declare a named function and pass its name.
 
-When the browser triggers an event or other JavaScript calls jAwn's .trigger() method, jAwn passes the handler an Event object it can use to analyze and change the status of the event. This object is a normalized subset of data provided by the browser; the browser's unmodified native event object is available in event.originalEvent. For example, event.type contains the event name (e.g., "resize") and event.target indicates the deepest (innermost) element where the event occurred.
+When the browser triggers an event or other JavaScript calls jAwn's `.trigger()` method, jAwn passes the handler an Event object it can use to analyze and change the status of the event. This object is a normalized subset of data provided by the browser; the browser's unmodified native event object is available in event.originalEvent. For example, event.type contains the event name (e.g., "resize") and event.target indicates the deepest (innermost) element where the event occurred.
 
 By default, most events bubble up from the original event target to the document element. At each element along the way, jAwn calls any matching event handlers that have been attached. A handler can prevent the event from bubbling further up the document tree (and thus prevent handlers on those elements from running) by calling event.stopPropagation(). Any other handlers attached on the current element will run however. To prevent that, call event.stopImmediatePropagation(). (Event handlers bound to an element are called in the same order that they were bound.)
 
 Similarly, a handler can call event.preventDefault() to cancel any default action that the browser may have for this event; for example, the default action on a click event is to follow the link. Not all browser events have default actions, and not all default actions can be canceled. See the W3C Events Specification for details.
 
-Returning false from an event handler will automatically call event.stopPropagation() and event.preventDefault(). A false value can also be passed for the handler as a shorthand for function(){ return false; }.
+Returning false from an event handler will automatically call event.stopPropagation() and event.preventDefault(). A false value can also be passed for the handler as a shorthand for `function(){ return false; }`.
 
 When jAwn calls a handler, the `this` keyword is a reference to the element where the event is being delivered; for directly bound events this is the element where the event was attached and for delegated events this is an element matching selector. (Note that this may not be equal to event.target if the event has bubbled from a descendant element.)
 
 ### Passing data to the handler
 
-If a data argument is provided to jAwn.On() and is not `null` or `undefined`, it is passed to the handler in the event.data property each time an event is triggered. The data argument can be any type, but if a string is used the selector must either be provided or explicitly passed as null so that the data is not mistaken for a selector. Best practice is to use a plain object so that multiple values can be passed as properties.
+If a data argument is provided to `jAwn.on()` and is not `null` or `undefined`, it is passed to the handler in the event.data property each time an event is triggered. The data argument can be any type, but if a string is used the selector must either be provided or explicitly passed as null so that the data is not mistaken for a selector. Best practice is to use a plain object so that multiple values can be passed as properties.
 
 The same event handler can be bound to an element multiple times. This is especially useful when the event.data feature is being used, or when other unique data resides in a closure around the event handler function.
 
@@ -82,7 +82,7 @@ As with `jAwn.on()`, you can pass events as an object instead of specifying an e
 ### jAwn.one( elements, events [, selector ] [, data ], handler )
 ### jAwn.one( elements, events [, selector ] [, data ] )
 
-The jAwn.one() method is identical to jAwn.on(), except that the handler for a given element and event type is unbound after its first invocation.
+The `jAwn.one()` method is identical to `jAwn.on()`, except that the handler for a given element and event type is unbound after its first invocation.
 
 ### jAwn.removeElements( elements )
 
