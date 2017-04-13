@@ -1,0 +1,24 @@
+{
+  "name": "jawn.js",
+  "version": "1.0.0",
+  "description": "A JavaScript event library for everything jQuery events offers without the jQuery",
+  "main": "jAwn.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/AtheistP3ace/jAwn.git"
+  },
+  "keywords": [
+    "events",
+    "javascript",
+    "event-management"
+  ],
+  "author": "AtheistP3ace",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/AtheistP3ace/jAwn/issues"
+  },
+  "homepage": "https://github.com/AtheistP3ace/jAwn#readme"
+}
