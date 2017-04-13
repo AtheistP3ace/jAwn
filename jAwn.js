@@ -1,8 +1,8 @@
-(function (jAwn, window, document, Cache, undefined) {
+(function (jAwn, window, document, cache, undefined) {
 
     // Private Variables
-    var EventGUID = 0;
-    var CommonGUID = 'jAwn' + ('2.1.1' + Math.random()).replace(/\D/g, '');
+    var eventGUID = 0;
+    var commonGUID = 'jAwn' + ('3.0' + Math.random()).replace(/\D/g, '');
     var expr = {
         attrHandle: {},
         match: {
@@ -10,14 +10,15 @@
             needsContext: /^[\x20\t\r\n\f]*[>+~]/
         }
     };
-    var FocusinBubbles = 'onfocusin' in window;
-    var PlainObject = {};
-    var HasOwn = PlainObject.hasOwnProperty;
-    var PlainArray = [];
-    var slice = PlainArray.slice;
-    var concat = PlainArray.concat;
-    var push = PlainArray.push;
-    var indexOf = PlainArray.indexOf;
+    var focusinBubbles = 'onfocusin' in window;
+    var plainObject = {};
+    var hasOwn = plainObject.hasOwnProperty;
+    var toString = plainObject.toString;
+    var plainArray = [];
+    var slice = plainArray.slice;
+    var concat = plainArray.concat;
+    var push = plainArray.push;
+    var indexOf = plainArray.indexOf;
     var rkeyEvent = /^key/,
         rmouseEvent = /^(?:mouse|pointer|contextmenu|drag|drop)|click/,
         rfocusMorph = /^(?:focusinfocus|focusoutblur)$/,
@@ -28,7 +29,7 @@
         add: function (elem, types, handler, data, selector) {
 
             var handleObjIn, eventHandle, tmp, events, t, handleObj, special, handlers, type, namespaces, origType,
-                elemData = Cache.Get(elem) || {};
+                elemData = cache.get(elem) || {};
 
             // Caller can pass in an object of custom data in lieu of the handler
             if (handler.handler) {
@@ -40,12 +41,12 @@
 
             // If the selector is invalid, throw any exceptions at attach time
             if (selector) {
-                Find(selector, elem);
+                find(selector, elem);
             }
 
             // Make sure that the handler has a unique ID, used to find/remove it later
             if (!handler.guid) {
-                handler.guid = 'jAwnGUID' + EventGUID++;
+                handler.guid = 'jAwnGUID' + eventGUID++;
             }
 
             // Init the element's event structure and main handler, if this is the first
@@ -83,7 +84,7 @@
                 special = eventInternal.special[type] || {};
 
                 // handleObj is passed to all event handlers
-                handleObj = MergeObjects({
+                handleObj = mergeObjects({
                     type: type,
                     origType: origType,
                     data: data,
@@ -133,7 +134,7 @@
         remove: function (elem, types, handler, selector, mappedTypes) {
 
             var j, origCount, tmp, events, t, handleObj, special, handlers, type, namespaces, origType,
-                elemData = Cache.HasData(elem) && Cache.Get(elem);
+                elemData = cache.hasData(elem) && cache.get(elem);
 
             if (!elemData || !(events = elemData.events)) {
                 return;
@@ -184,24 +185,24 @@
                 // (avoids potential for endless recursion during removal of special event handlers)
                 if (origCount && !handlers.length) {
                     if (!special.teardown || special.teardown.call(elem, namespaces, elemData.handle) === false) {
-                        jAwn.RemoveEvent(elem, type, elemData.handle);
+                        jAwn.removeEvent(elem, type, elemData.handle);
                     }
                     delete events[type];
                 }
             }
 
-            // Remove the CommonGUID if it's no longer used
-            if (IsEmptyObject(events)) {
+            // Remove the commonGUID if it's no longer used
+            if (isEmptyObject(events)) {
                 delete elemData.handle;
-                Cache.Remove(elem, 'events');
+                cache.remove(elem, 'events');
             }
         },
 
         trigger: function (event, data, elem, onlyHandlers) {
 
             var i, cur, tmp, bubbleType, ontype, handle, special, eventPath = [elem || document],
-                type = HasOwn.call(event, 'type') ? event.type : event,
-                namespaces = HasOwn.call(event, 'namespace') ? event.namespace.split('.') : [];
+                type = hasOwn.call(event, 'type') ? event.type : event,
+                namespaces = hasOwn.call(event, 'namespace') ? event.namespace.split('.') : [];
 
             cur = tmp = elem = elem || document;
 
@@ -223,8 +224,8 @@
             }
             ontype = type.indexOf(':') < 0 && 'on' + type;
 
-            // Caller can pass in a jAwn.Event object, Object, or just an event type string
-            event = event[CommonGUID] ? event : new jAwn.Event(type, IsObject(event) && event);
+            // Caller can pass in a jAwn.event object, Object, or just an event type string
+            event = event[commonGUID] ? event : new jAwn.event(type, isObject(event) && event);
 
             // Trigger bitmask: & 1 for native handlers; & 2 for custom (always true)
             event.isTrigger = onlyHandlers ? 2 : 3;
@@ -238,7 +239,7 @@
             }
 
             // Clone any incoming data and prepend the event, creating the handler arg list
-            data = data == null ? [event] : MakeArray(data, [event]);
+            data = data == null ? [event] : makeArray(data, [event]);
 
             // Allow special events to draw outside the lines
             special = eventInternal.special[type] || {};
@@ -248,7 +249,7 @@
 
             // Determine event propagation path in advance, per W3C events spec (#9951)
             // Bubble up to document, then to window; watch for a global ownerDocument var (#9724)
-            if (!onlyHandlers && !special.noBubble && !IsWindow(elem)) {
+            if (!onlyHandlers && !special.noBubble && !isWindow(elem)) {
 
                 bubbleType = special.delegateType || type;
                 if (!rfocusMorph.test(bubbleType + type)) {
@@ -272,14 +273,14 @@
                 event.type = i > 1 ? bubbleType : special.bindType || type;
 
                 // Custom handler
-                handle = (Cache.Get(cur, 'events') || {})[event.type] && Cache.Get(cur, 'handle');
+                handle = (cache.get(cur, 'events') || {})[event.type] && cache.get(cur, 'handle');
                 if (handle) {
                     handle.apply(cur, data);
                 }
 
                 // Native handler
                 handle = ontype && cur[ontype];
-                if (handle && handle.apply && AcceptData(cur)) {
+                if (handle && handle.apply && acceptData(cur)) {
                     event.result = handle.apply(cur, data);
                     if (event.result === false) {
                         event.preventDefault();
@@ -291,11 +292,11 @@
             // If nobody prevented the default action, do it now
             if (!onlyHandlers && !event.isDefaultPrevented()) {
 
-                if ((!special._default || special._default.apply(eventPath.pop(), data) === false) && AcceptData(elem)) {
+                if ((!special._default || special._default.apply(eventPath.pop(), data) === false) && acceptData(elem)) {
 
                     // Call a native DOM method on the target with the same name name as the event.
                     // Don't do default actions on window, that's where global variables be (#6170)
-                    if (ontype && IsFunction(elem[type]) && !IsWindow(elem)) {
+                    if (ontype && isFunction(elem[type]) && !isWindow(elem)) {
 
                         // Don't re-trigger an onFOO event when we call its FOO() method
                         tmp = elem[ontype];
@@ -320,15 +321,15 @@
 
         dispatch: function (nativeEvent) {
 
-            // Make a writable jAwn.Event from the native event object
+            // Make a writable jAwn.event from the native event object
             var event = eventInternal.fix(nativeEvent);
 
             var i, j, ret, matched, handleObj, handlerQueue,
                 args = new Array(arguments.length),
-                handlers = (Cache.Get(this, 'events') || {})[event.type] || [],
+                handlers = (cache.get(this, 'events') || {})[event.type] || [],
                 special = eventInternal.special[event.type] || {};
 
-            // Use the fix-ed jAwn.Event rather than the (read-only) native event
+            // Use the fix-ed jAwn.event rather than the (read-only) native event
             args[0] = event;
             for (i = 1; i < arguments.length; i++) {
                 args[i] = arguments[i];
@@ -401,7 +402,7 @@
                             sel = handleObj.selector + ' ';
 
                             if (matches[sel] === undefined) {
-                                matches[sel] = handleObj.needsContext ? Index(QueryAll(sel, this), cur) >= 0 : Find(sel, this, null, [cur]).length;
+                                matches[sel] = handleObj.needsContext ? getIndex(queryAll(sel, this), cur) >= 0 : find(sel, this, null, [cur]).length;
                             }
                             if (matches[sel]) {
                                 matches.push(handleObj);
@@ -422,11 +423,11 @@
         },
 
         addProp: function (name, hook) {
-            Object.defineProperty(jAwn.Event.prototype, name, {
+            Object.defineProperty(jAwn.event.prototype, name, {
                 enumerable: true,
                 configurable: true,
 
-                get: IsFunction(hook) ?
+                get: isFunction(hook) ?
                     function () {
                         if (this.originalEvent) {
                             return hook(this.originalEvent);
@@ -450,7 +451,7 @@
         },
 
         fix: function (originalEvent) {
-            return originalEvent[CommonGUID] ? originalEvent : new jAwn.Event(originalEvent);
+            return originalEvent[commonGUID] ? originalEvent : new jAwn.event(originalEvent);
         },
 
         special: {
@@ -461,7 +462,7 @@
             focus: {
                 // Fire native event if possible so blur/focus sequence is correct
                 trigger: function () {
-                    if (this !== SafeActiveElement() && this.focus) {
+                    if (this !== safeActiveElement() && this.focus) {
                         this.focus();
                         return false;
                     }
@@ -470,7 +471,7 @@
             },
             blur: {
                 trigger: function () {
-                    if (this === SafeActiveElement() && this.blur) {
+                    if (this === safeActiveElement() && this.blur) {
                         this.blur();
                         return false;
                     }
@@ -480,7 +481,7 @@
             click: {
                 // For checkbox, fire native event so checked state will be right
                 trigger: function () {
-                    if (this.type === 'checkbox' && this.click && CheckNodeType(this, 'input')) {
+                    if (this.type === 'checkbox' && this.click && checkNodeType(this, 'input')) {
                         this.click();
                         return false;
                     }
@@ -488,7 +489,7 @@
 
                 // For cross-browser consistency, don't fire native .click() on links
                 _default: function (event) {
-                    return CheckNodeType(event.target, 'a');
+                    return checkNodeType(event.target, 'a');
                 }
             },
 
@@ -507,8 +508,8 @@
         simulate: function (type, elem, event, bubble) {
             // Piggyback on a donor event to simulate a different one
             // Used only for `focus(in | out)` events
-            var e = MergeObjects(
-                new jAwn.Event(),
+            var e = mergeObjects(
+                new jAwn.event(),
                 event,
                 {
                     type: type,
@@ -519,12 +520,12 @@
         }
     };
 
-    // jAwn.Event is based on DOM3 Events as specified by the ECMAScript Language Binding
+    // jAwn.event is based on DOM3 Events as specified by the ECMAScript Language Binding
     // http://www.w3.org/TR/2003/WD-DOM-Level-3-Events-20030331/ecma-script-binding.html
-    jAwn.Event = function (src, props) {
+    jAwn.event = function (src, props) {
         // Allow instantiation without the 'new' keyword
-        if (!(this instanceof jAwn.Event)) {
-            return new jAwn.Event(src, props);
+        if (!(this instanceof jAwn.event)) {
+            return new jAwn.event(src, props);
         }
 
         // Event object
@@ -535,7 +536,7 @@
             // Events bubbling up the document may have been marked as prevented
             // by a handler lower down the tree; reflect the correct value.
             // Support: Android < 4.0
-            this.isDefaultPrevented = src.defaultPrevented || src.defaultPrevented === undefined && src.returnValue === false ? ReturnTrue : ReturnFalse;
+            this.isDefaultPrevented = src.defaultPrevented || src.defaultPrevented === undefined && src.returnValue === false ? returnTrue : returnFalse;
 
             // Create target properties
             // Support: Safari <=6 - 7 only
@@ -552,39 +553,39 @@
 
         // Put explicitly provided properties onto the event object
         if (props) {
-            MergeObjects(this, props);
+            mergeObjects(this, props);
         }
 
         // Create a timestamp if incoming event doesn't have one
         this.timeStamp = src && src.timeStamp || Date.now();
 
         // Mark it as fixed
-        this[CommonGUID] = true;
+        this[commonGUID] = true;
     };
 
-    jAwn.Event.prototype = {
-        constructor: jAwn.Event,
-        isDefaultPrevented: ReturnFalse,
-        isPropagationStopped: ReturnFalse,
-        isImmediatePropagationStopped: ReturnFalse,
+    jAwn.event.prototype = {
+        constructor: jAwn.event,
+        isDefaultPrevented: returnFalse,
+        isPropagationStopped: returnFalse,
+        isImmediatePropagationStopped: returnFalse,
         isSimulated: false,
         preventDefault: function () {
             var e = this.originalEvent;
-            this.isDefaultPrevented = ReturnTrue;
+            this.isDefaultPrevented = returnTrue;
             if (e && !this.isSimulated) {
                 e.preventDefault();
             }
         },
         stopPropagation: function () {
             var e = this.originalEvent;
-            this.isPropagationStopped = ReturnTrue;
+            this.isPropagationStopped = returnTrue;
             if (e && !this.isSimulated) {
                 e.stopPropagation();
             }
         },
         stopImmediatePropagation: function () {
             var e = this.originalEvent;
-            this.isImmediatePropagationStopped = ReturnTrue;
+            this.isImmediatePropagationStopped = returnTrue;
             if (e && !this.isSimulated) {
                 e.stopImmediatePropagation();
             }
@@ -593,7 +594,7 @@
     };
 
     // Public Methods
-    jAwn.RemoveEvent = function (elem, type, handle) {
+    jAwn.removeEvent = function (elem, type, handle) {
 
         if (elem.removeEventListener) {
             elem.removeEventListener(type, handle, false);
@@ -601,9 +602,9 @@
 
     };
 
-    jAwn.GetInternal = function (property) {
+    jAwn.getInternal = function (property) {
 
-        if (IsDefined(property) && IsNotEmptyString(property)) {
+        if (isDefined(property) && isNotEmptyString(property)) {
             return eventInternal[property];
         }
         else {
@@ -612,20 +613,20 @@
 
     };
 
-    jAwn.On = function (elements, types, selector, data, fn, one) {
+    jAwn.on = function (elements, types, selector, data, fn, one) {
 
         var origFn, type;
 
         // Types can be a map of types/handlers
-        if (IsObject(types)) {
+        if (isObject(types)) {
             // (types-Object, selector, data)
-            if (IsString(selector)) {
+            if (isString(selector)) {
                 // (types-Object, data)
                 data = data || selector;
                 selector = undefined;
             }
             for (type in types) {
-                jAwn.On(elements, type, selector, data, types[type], one);
+                jAwn.on(elements, type, selector, data, types[type], one);
             }
             return elements;
         }
@@ -636,7 +637,7 @@
             data = selector = undefined;
         }
         else if (fn == null) {
-            if (IsString(selector)) {
+            if (isString(selector)) {
                 // (types, selector, fn)
                 fn = data;
                 data = undefined;
@@ -649,7 +650,7 @@
             }
         }
         if (fn === false) {
-            fn = ReturnFalse;
+            fn = returnFalse;
         }
         else if (!fn) {
             return elements;
@@ -659,14 +660,14 @@
             origFn = fn;
             fn = function (event) {
                 // Can use an empty set, since event contains the info
-                jAwn.Off(event);
+                jAwn.off(event);
                 return origFn.apply(this, arguments);
             };
 
             // Use same guid so caller can remove using origFn
-            fn.guid = origFn.guid || (origFn.guid = 'jAwnGUID' + EventGUID++);
+            fn.guid = origFn.guid || (origFn.guid = 'jAwnGUID' + eventGUID++);
         }
-        if (IsArray(elements)) {
+        if (isArray(elements)) {
             var index = 0, length = elements.length;
             for ( ; index < length; index++) {
                 eventInternal.add(elements[index], types, fn, data, selector);
@@ -678,41 +679,41 @@
 
     };
 
-    jAwn.One = function (elements, types, selector, data, fn) {
+    jAwn.one = function (elements, types, selector, data, fn) {
 
-        return jAwn.On(elements, types, selector, data, fn, 1);
+        return jAwn.on(elements, types, selector, data, fn, 1);
 
     };
 
-    jAwn.Off = function (elements, types, selector, fn) {
+    jAwn.off = function (elements, types, selector, fn) {
 
         var handleObj, type;
         if (elements && elements.preventDefault && elements.handleObj) {
-            // (event)  dispatched jAwn.Event
+            // (event)  dispatched jAwn.event
             handleObj = elements.handleObj;
-            jAwn.Off(elements.delegateTarget,
+            jAwn.off(elements.delegateTarget,
                 handleObj.namespace ? handleObj.origType + '.' + handleObj.namespace : handleObj.origType,
                 handleObj.selector,
                 handleObj.handler
             );
             return elements;
         }
-        if (IsObject(types)) {
+        if (isObject(types)) {
             // (types-object [, selector])
             for (type in types) {
-                jAwn.Off(elements, type, selector, types[type]);
+                jAwn.off(elements, type, selector, types[type]);
             }
             return elements;
         }
-        if (selector === false || IsFunction(selector)) {
+        if (selector === false || isFunction(selector)) {
             // (types [, fn])
             fn = selector;
             selector = undefined;
         }
         if (fn === false) {
-            fn = ReturnFalse;
+            fn = returnFalse;
         }
-        if (IsArray(elements)) {
+        if (isArray(elements)) {
             var index = 0, length = elements.length;
             for ( ; index < length; index++) {
                 eventInternal.remove(elements[index], types, fn, selector);
@@ -724,9 +725,9 @@
 
     };
 
-    jAwn.Trigger = function (elements, type, data) {
+    jAwn.trigger = function (elements, type, data) {
 
-        if (IsArray(elements)) {
+        if (isArray(elements)) {
             var index = 0, length = elements.length;
             for ( ; index < length; index++) {
                 eventInternal.trigger(type, data, elements[index]);
@@ -738,7 +739,7 @@
 
     };
 
-    jAwn.TriggerHandler = function (element, type, data) {
+    jAwn.triggerHandler = function (element, type, data) {
 
         if (element) {
             return eventInternal.trigger(type, data, element, true);
@@ -746,22 +747,16 @@
 
     };
 
-    jAwn.GetNextEventGUID = function () {
-
-        return EventGUID++;
-
-    };
-
     // Private Methods
     // Custom function to support $.find
-    function Find (selector, context, results, seed) {
+    function find (selector, context, results, seed) {
 
         var elem, nodeType, i = 0;
         results = results || [];
         context = context || document;
 
         // Same basic safeguard as Sizzle
-        if (!selector || !IsString(selector)) {
+        if (!selector || !isString(selector)) {
             return results;
         }
 
@@ -777,21 +772,21 @@
             }
         }
         else {
-            MergeArray(results, QueryAll(selector, context));
+            mergeArray(results, queryAll(selector, context));
         }
         return results;
 
     };
 
-    function Index (elements, elem) {
+    function getIndex (elements, elem) {
 
         // No argument, return index in parent
         if (!elem) {
-            return (elements[0] && elements[0].parentNode) ? GetAllSibling(elements[0], SiblingType.Previous).length : -1;
+            return (elements[0] && elements[0].parentNode) ? getAllSibling(elements[0], siblingType.Previous).length : -1;
         }
 
         // index in selector
-        if (IsString(elem)) {
+        if (isString(elem)) {
             return indexOf.call(elem, elements[0]);
         }
 
@@ -800,12 +795,12 @@
 
     }
 
-    function MakeArray (arr, results) {
+    function makeArray (arr, results) {
 
         var ret = results || [];
         if (arr != null) {
-            if (IsArrayLike(Object(arr))) {
-                MergeArray(ret, IsString(arr) ? [arr] : arr);
+            if (isArrayLike(Object(arr))) {
+                mergeArray(ret, isString(arr) ? [arr] : arr);
             }
             else {
                 push.call(ret, arr);
@@ -815,21 +810,21 @@
 
     };
 
-    function IsArrayLike (obj) {
+    function isArrayLike (obj) {
 
         var length = obj.length,
-            type = GetType(obj);
-        if (IsFunction(type) || IsWindow(obj)) {
+            type = getType(obj);
+        if (isFunction(type) || isWindow(obj)) {
             return false;
         }
         if (obj.nodeType === 1 && length) {
             return true;
         }
-        return type === 'array' || length === 0 || IsNumber(length) && length > 0 && (length - 1) in obj;
+        return type === 'array' || length === 0 || isNumber(length) && length > 0 && (length - 1) in obj;
 
     };
 
-    function AcceptData (owner) {
+    function acceptData (owner) {
 
         // Accepts only:
         //  - Node
@@ -841,26 +836,26 @@
 
     };
 
-    function Contains (a, b) {
+    function contains (a, b) {
 
         var adown = a.nodeType === 9 ? a.documentElement : a, bup = b && b.parentNode;
         return a === bup || !!(bup && bup.nodeType === 1 && adown.contains(bup));
 
     }
 
-    function ReturnTrue () {
+    function returnTrue () {
 
         return true;
 
     };
 
-    function ReturnFalse () {
+    function returnFalse () {
 
         return false;
 
     };
 
-    function SafeActiveElement () {
+    function safeActiveElement () {
 
         try {
             return document.activeElement;
@@ -946,7 +941,7 @@
 
                     // For mousenter/leave call the handler if related is outside the target.
                     // NB: No relatedTarget if the mouse left/entered the browser window
-                    if (!related || (related !== target && !Contains(target, related))) {
+                    if (!related || (related !== target && !contains(target, related))) {
                         event.type = handleObj.origType;
                         ret = handleObj.handler.apply(this, arguments);
                         event.type = value;
@@ -959,7 +954,7 @@
 
     // Create 'bubbling' focus and blur events
     // Support: Firefox, Chrome, Safari
-    if (!FocusinBubbles) {
+    if (!focusinBubbles) {
         var bubbleEvents = {
             focus: 'focusin',
             blur: 'focusout'
@@ -973,21 +968,21 @@
                 };
                 eventInternal.special[value] = {
                     setup: function () {
-                        var doc = this.ownerDocument || this, attaches = Cache.Access(doc, value);
+                        var doc = this.ownerDocument || this, attaches = cache.access(doc, value);
                         if (!attaches) {
                             doc.addEventListener(property, handler, true);
                         }
-                        Cache.Access(doc, value, (attaches || 0) + 1);
+                        cache.access(doc, value, (attaches || 0) + 1);
                     },
                     teardown: function () {
-                        var doc = this.ownerDocument || this, attaches = Cache.Access(doc, value) - 1;
+                        var doc = this.ownerDocument || this, attaches = cache.access(doc, value) - 1;
                         if (!attaches) {
                             doc.removeEventListener(property, handler, true);
-                            Cache.Remove(doc, value);
+                            cache.remove(doc, value);
 
                         }
                         else {
-                            Cache.Access(doc, value, attaches);
+                            cache.access(doc, value, attaches);
                         }
                     }
                 };
@@ -996,51 +991,47 @@
     }
 
 	// Functions and stuff
-	
-    var SiblingType = {
-        Previous: 'Previous',
-        Next: 'Next',
-        All: 'All'
-    };
 
     // Retrieve elements with a selector, optional context
-    function QueryAll (selector, context, fromParent) {
+    function queryAll (selector, context) {
 
-		// Determine if context was not passed in at all but fromParent was
-        if (IsNotDefined(context)) {
+		// Determine if context was not passed in
+        if (isNotDefined(context)) {
             context = document;
         }
-        if (fromParent) {
-            context = parent.document;
-        }
-        return NodeListToArray(context.querySelectorAll(selector));
+        return nodeListToArray(context.querySelectorAll(selector));
 
     };
 
     // Converts a node list into an array
-    function NodeListToArray (nodeList) {
+    function nodeListToArray (nodeList) {
 
         return [].slice.call(nodeList, 0);
 
     };
 
     // Retrieve all previous, all next or all siblings of an element, optional selector to filter
-    function GetAllSibling (context, type, selector) {
+    var siblingType = {
+        Previous: 'Previous',
+        Next: 'Next',
+        All: 'All'
+    };
+    function getAllSibling (context, type, selector) {
 
         var match = [];
-        if (IsNotDefined(context)) {
+        if (isNotDefined(context)) {
             return match;
         }
-        if (type == SiblingType.Next || type == SiblingType.Previous) {
+        if (type == siblingType.Next || type == siblingType.Previous) {
             var siblingProperty = '';
-            if (type == SiblingType.Next) {
+            if (type == siblingType.Next) {
                 siblingProperty = 'nextSibling';
             }
-            else if (type == SiblingType.Previous) {
+            else if (type == siblingType.Previous) {
                 siblingProperty = 'previousSibling';
             }
             while (context = context[siblingProperty]) {
-                if (IsDefined(selector)) {
+                if (isDefined(selector)) {
                     if (context.matches(selector)) {
                         match.push(context);
                     }
@@ -1050,13 +1041,13 @@
                 }
             }
         }
-        else if (type == SiblingType.All) {
+        else if (type == siblingType.All) {
             var currentSibling = context.parentNode.firstChild;
             do {
                 if (currentSibling == context) {
                     continue;
                 }
-                if (IsDefined(selector)) {
+                if (isDefined(selector)) {
                     if (currentSibling.matches(selector)) {
                         match.push(currentSibling);
                     }
@@ -1071,11 +1062,11 @@
     };
 
     // Remove an element or array of elements from the DOM, this will off all events and remove cache
-    jAwn.RemoveElements = function (elements, ignoreData) {
+    jAwn.removeElements = function (elements, ignoreData) {
 
         // Initialize and sanity check
         var removedChildren = []
-        if (IsNotDefined(elements)) {
+        if (isNotDefined(elements)) {
             return removedChildren;
         }
 
@@ -1094,10 +1085,10 @@
                 childElements = element.getElementsByTagName('*');
 
                 // Merge top element back in for clean up
-                childElements = MergeArray([element], childElements);
-                Cache.CleanElementData(childElements);
+                childElements = mergeArray([element], childElements);
+                cache.cleanElementData(childElements);
             }
-            if (IsDefined(element.parentNode)) {
+            if (isDefined(element.parentNode)) {
                 removedChild = element.parentNode.removeChild(element);
                 removedChildren.push(removedChild);
             }
@@ -1107,14 +1098,14 @@
     };
 
     // Removes element or array of elements from DOM but does not clean up events or data associated with them
-    jAwn.Detach = function (elements) {
+    jAwn.detach = function (elements) {
 
-        return Common.Remove(elements, true);
+        return jAwn.removeElements(elements, true);
 
     };
 
     // Merge the contents of two or more objects together into the first object
-    function MergeObjects () {
+    function mergeObjects () {
 
         var options, name, src, copy, copyIsArray, clone,
         target = arguments[0] || {},
@@ -1123,7 +1114,7 @@
         deep = false;
 
         // Handle a deep copy situation
-        if (IsBoolean(target)) {
+        if (isBoolean(target)) {
             deep = target;
 
             // Skip the boolean and the target
@@ -1132,7 +1123,7 @@
         }
 
         // Handle case when target is a string or something (possible in deep copy)
-        if (!IsObject(target) && !IsFunction(target)) {
+        if (!isObject(target) && !isFunction(target)) {
             target = {};
         }
 
@@ -1156,18 +1147,18 @@
                     }
 
                     // Recurse if we're merging plain objects or arrays
-                    if (deep && copy && (IsPlainObject(copy) || (copyIsArray = IsArray(copy)))) {
+                    if (deep && copy && (isPlainObject(copy) || (copyIsArray = isArray(copy)))) {
                         if (copyIsArray) {
                             copyIsArray = false;
-                            clone = src && IsArray(src) ? src : [];
+                            clone = src && isArray(src) ? src : [];
 
                         }
                         else {
-                            clone = src && IsPlainObject(src) ? src : {};
+                            clone = src && isPlainObject(src) ? src : {};
                         }
 
                         // Never move original objects, clone them
-                        target[name] = MergeObjects(deep, clone, copy);
+                        target[name] = mergeObjects(deep, clone, copy);
 
                     // Don't bring in undefined values
                     }
@@ -1184,15 +1175,12 @@
     };
 
     // Determines if an object is a plain old javascript object
-    var PlainObject = {};
-    var HasOwn = PlainObject.hasOwnProperty;
-    var ToString = PlainObject.toString;
-    function IsPlainObject (object) {
+    function isPlainObject (object) {
 
-        if (GetType(object) !== 'object' || object.nodeType || IsWindow(object)) {
+        if (getType(object) !== 'object' || object.nodeType || isWindow(object)) {
             return false;
         }
-        if (object.constructor && !HasOwn.call(object.constructor.prototype, 'isPrototypeOf')) {
+        if (object.constructor && !hasOwn.call(object.constructor.prototype, 'isPrototypeOf')) {
             return false;
         }
         return true;
@@ -1200,26 +1188,26 @@
     };
 
     // Determines if an element matches passed in type
-    function CheckNodeType (element, name) {
+    function checkNodeType (element, name) {
 
         return element.nodeName && element.nodeName.toLowerCase() === name.toLowerCase();
 
     };
 
     // Returns type of an object
-    function GetType (object) {
+    function getType (object) {
 
         if (object == null) {
             return object + '';
         }
 
         // Support: Android < 4.0, iOS < 6 (functionish RegExp)
-        return IsObject(object) || IsFunction(object) ? PlainObject[ToString.call(object)] || 'object' : typeof object;
+        return isObject(object) || isFunction(object) ? plainObject[toString.call(object)] || 'object' : typeof object;
 
     };
 
     // Merge the contents of two arrays together into the first array, pass empty array as first argument to clone an array
-    function MergeArray (first, second) {
+    function mergeArray (first, second) {
 
         // Initialize
         var length = +second.length, index = 0, newLength = first.length;
@@ -1235,70 +1223,70 @@
     };
 
     // Determines if object is window object
-    function IsWindow (object) {
+    function isWindow (object) {
 
-        return IsDefined(object) && object === object.window;
+        return isDefined(object) && object === object.window;
 
     };
 
     // Determines if object is an object
-    function IsObject (object) {
+    function isObject (object) {
 
         return typeof object === 'object';
 
     };
 
     // Determines if object is a function
-    function IsFunction (object) {
+    function isFunction (object) {
 
         return typeof object === 'function';
 
     };
 
     // Determines if object is a string
-    function IsString (object) {
+    function isString (object) {
 
         return typeof object === 'string';
 
     };
 
     // Determines if object is a boolean
-    function IsBoolean (object) {
+    function isBoolean (object) {
 
         return typeof object === 'boolean';
 
     };
 
     // Determines if object is a number
-    function IsNumber (object) {
+    function isNumber (object) {
 
         return typeof object === 'number';
 
     };
 
     // Determines if object is an array
-    function IsArray (object) {
+    function isArray (object) {
 
         return Array.isArray(object);
 
     };
 
     // Determines if value defined and not null
-    function IsDefined (value) {
+    function isDefined (value) {
 
         return typeof value !== 'undefined' && value != null;
 
     };
 
     // Determines if value is undefined or null
-    function IsNotDefined (value) {
+    function isNotDefined (value) {
 
-        return !IsDefined(value);
+        return !isDefined(value);
 
     };
 
     // Determines if object is empty
-    function IsEmptyObject (object) {
+    function isEmptyObject (object) {
 
         var property;
         for (property in object) {
@@ -1309,17 +1297,17 @@
     };
 
     // Determines if string is empty
-    function IsEmptyString (value) {
+    function isEmptyString (value) {
 
         return value === '';
 
     };
 
     // Determines if string is not empty
-    function IsNotEmptyString (value) {
+    function isNotEmptyString (value) {
 
-        return !IsEmptyString(value);
+        return !isEmptyString(value);
 
     };
 
-} (window.jAwn = window.jAwn || {}, window, document, Cache));
+} (window.jAwn = window.jAwn || {}, window, document, cache));

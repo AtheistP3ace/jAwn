@@ -1,5 +1,5 @@
 // Cache
-(function (Cache, window, document, undefined) {
+(function (cache, window, document, undefined) {
 
     // Private Variables
     var rnotwhite = (/\S+/g);
@@ -12,13 +12,13 @@
     };
 
     // Private Methods
-    function CamelCase (string) {
+    function camelCase (string) {
 
         return string.replace(rmsPrefix, 'ms-').replace(rdashAlpha, fcamelCase);
 
     };
 
-    function AcceptData (owner) {
+    function acceptData (owner) {
 
         // Accepts only:
         //  - Node
@@ -31,45 +31,45 @@
     };
 
     // Data Cache Definition
-    function Data () {
+    function data () {
 
-        this.CacheKey = 'jAwnCache3.0' + Data.Guid++;
+        this.cacheKey = 'jAwnCache3.0' + data.guid++;
 
     };
-    Data.Guid = 1;
-    Data.Accepts = AcceptData;
-    Data.prototype = {
+    data.guid = 1;
+    data.accepts = acceptData;
+    data.prototype = {
         register: function (owner) {
 
             var value = {};
 
             // If it is a node unlikely to be stringify-ed or looped over use plain assignment
             if (owner.nodeType) {
-                owner[this.CacheKey] = value;
+                owner[this.cacheKey] = value;
             }
             else {
                 // Otherwise secure it in a non-enumerable, non-writable property
                 // configurability must be true to allow the property to be
                 // deleted with the delete operator
-                Object.defineProperty(owner, this.CacheKey, {
+                Object.defineProperty(owner, this.cacheKey, {
                     value: value,
                     writable: true,
                     configurable: true
                 });
             }
-            return owner[this.CacheKey];
+            return owner[this.cacheKey];
 
         },
         cache: function (owner) {
 
             // We can accept data for non-element nodes in modern browsers, but we should not, see #8335.
             // Always return an empty object.
-            if (!Data.Accepts(owner)) {
+            if (!data.accepts(owner)) {
                 return {};
             }
 
             // Check if the owner object already has a cache
-            var cache = owner[this.CacheKey];
+            var cache = owner[this.cacheKey];
 
             // If so, return it
             if (cache) {
@@ -84,12 +84,12 @@
 
             var prop, cache = this.cache(owner);
             if (typeof data === 'string') {
-                cache[CamelCase(data)] = value;
+                cache[camelCase(data)] = value;
             }
             else {
                 // Copy the properties one-by-one to the cache object
                 for (prop in data) {
-                    cache[CamelCase(prop)] = data[prop];
+                    cache[camelCase(prop)] = data[prop];
                 }
             }
             return cache;
@@ -98,7 +98,7 @@
         get: function (owner, key) {
 
             var cache = this.cache(owner);
-            return key === undefined ? cache : cache[CamelCase(key)];
+            return key === undefined ? cache : cache[camelCase(key)];
 
         },
         access: function (owner, key, value) {
@@ -133,7 +133,7 @@
         },
         remove: function (owner, key) {
 
-            var index, cache = owner[this.CacheKey];
+            var index, cache = owner[this.cacheKey];
 
             if (cache === undefined) {
                 return;
@@ -143,10 +143,10 @@
 
                 // Support array or space separated string of keys
                 if (Array.isArray(key)) {
-                    key = key.map(CamelCase);
+                    key = key.map(camelCase);
                 }
                 else {
-                    key = CamelCase(key);
+                    key = camelCase(key);
 
                     // If a key with the spaces exists, use it.
                     // Otherwise, create an array by matching non-whitespace
@@ -161,74 +161,74 @@
             }
 
             // Remove the cache key if there's no more data
-            if (key === undefined || IsEmptyObject(cache)) {
-                delete owner[ this.CacheKey ];
+            if (key === undefined || isEmptyObject(cache)) {
+                delete owner[ this.cacheKey ];
             }
 
         },
         hasData: function (owner) {
 
-            var cache = owner[this.CacheKey];
-            return cache !== undefined && !IsEmptyObject(cache);
+            var cache = owner[this.cacheKey];
+            return cache !== undefined && !isEmptyObject(cache);
 
         }
     };
 
     // Create new cache
-    var DataCache = new Data();
+    var dataCache = new data();
 
     // Public Methods
-    Cache.Get = function (element, key) {
+    cache.get = function (element, key) {
 
-        return DataCache.get(element, key);
-
-    };
-
-    Cache.Set = function (element, key, value) {
-
-        return DataCache.set(element, key, value);
+        return dataCache.get(element, key);
 
     };
 
-    Cache.Access = function (element, key, value) {
+    cache.set = function (element, key, value) {
 
-        return DataCache.access(element, key, value);
-
-    };
-
-    Cache.HasData = function (element) {
-
-        return DataCache.hasData(element);
+        return dataCache.set(element, key, value);
 
     };
 
-    Cache.Remove = function (element, key) {
+    cache.access = function (element, key, value) {
 
-        return DataCache.remove(element, key);
+        return dataCache.access(element, key, value);
+
+    };
+
+    cache.hasData = function (element) {
+
+        return dataCache.hasData(element);
+
+    };
+
+    cache.remove = function (element, key) {
+
+        return dataCache.remove(element, key);
 
     };
 
     // TODO: Test performance
     // Called from jAwn.RemoveElement to cleanup data and events on elements prior to removal from DOM
-    Cache.CleanElementData = function (elements) {
+    cache.cleanElementData = function (elements) {
 
         // Convert elements to an array, if necessary.
         if (!elements.length) {
             elements = [elements];
         }
         var data, element, type, index = 0;
-        var eventInternal = jAwn.GetInternal();
+        var eventInternal = jAwn.getInternal();
         var special = eventInternal.special;
 
         // For each element destroy widgets, remove events and delete any remaining data
         for ( ; (element = elements[index]) !== undefined; index++) {
-            if (AcceptData(element) && (data = element[DataCache.CacheKey])) {
+            if (acceptData(element) && (data = element[dataCache.cacheKey])) {
                 if (data.events) {
                     // Destroy widgets on elements
                     try {
                         // Only trigger remove when necessary to save time
                         if (data.events.remove) {
-                            jAwn.TriggerHandler(element, 'remove');
+                            jAwn.triggerHandler(element, 'remove');
                         }
                     } catch (e) {}
 
@@ -247,14 +247,14 @@
                 }
 
                 // Remove data
-                delete element[DataCache.CacheKey];
+                delete element[dataCache.cacheKey];
             }
         }
 
     };
 
     // Determines if object is empty
-    function IsEmptyObject (object) {
+    function isEmptyObject (object) {
 
         var property;
         for (property in object) {
@@ -264,4 +264,4 @@
 
     };
 
-} (window.Cache = window.Cache || {}, window, document));
+} (window.cache = window.cache || {}, window, document));
