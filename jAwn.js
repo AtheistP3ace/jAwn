@@ -870,6 +870,11 @@
 
         var origFn, type;
 
+		// NodeList?
+		if (isNodeList(elements)) {
+			elements = nodeListToArray(elements);
+		}
+
         // Types can be a map of types/handlers
         if (isObject(types)) {
             // (types-Object, selector, data)
@@ -934,11 +939,21 @@
 
     jAwn.one = function (elements, types, selector, data, fn) {
 
+		// NodeList?
+		if (isNodeList(elements)) {
+			elements = nodeListToArray(elements);
+		}
+
         return jAwn.on(elements, types, selector, data, fn, 1);
 
     };
 
     jAwn.off = function (elements, types, selector, fn) {
+
+		// NodeList?
+		if (isNodeList(elements)) {
+			elements = nodeListToArray(elements);
+		}
 
         var handleObj, type;
         if (elements && elements.preventDefault && elements.handleObj) {
@@ -979,6 +994,11 @@
     };
 
     jAwn.trigger = function (elements, type, data) {
+
+		// NodeList?
+		if (isNodeList(elements)) {
+			elements = nodeListToArray(elements);
+		}
 
         if (isArray(elements)) {
             var index = 0, length = elements.length;
@@ -1550,5 +1570,15 @@
         return !isEmptyString(value);
 
     };
+
+	function isNodeList (nodes) {
+
+	    var stringRepr = toString.call(nodes);
+
+	    return typeof nodes === 'object' &&
+	        /^\[object (HTMLCollection|NodeList|Object)\]$/.test(stringRepr) &&
+	        (typeof nodes.length === 'number') &&
+	        (nodes.length === 0 || (typeof nodes[0] === "object" && nodes[0].nodeType > 0));
+	};
 
 } (window.jAwn = window.jAwn || {}, window, document));

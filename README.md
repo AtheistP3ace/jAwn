@@ -13,6 +13,8 @@ I put this together for myself so I could get all the great stuff jQuery gives y
 
 Base documentation exists below. Most likely if you can do it with jQuery events you can do it with jAwn. The only difference is the first argument is your elements. The only exception are custom events **defined** by jQuery, like _ajaxStart_, _ajaxEnd_, etc... Enjoy!
 
+#### In 1.1.0 added code to handle NodeLists. Usually the event functions only want arrays when passing multiple elements. For instance document.querySelectorAll returns a NodeList, not an array. You can now pass NodeLists directly into the event functions.
+
 ### jAwn.on( elements, events [, selector ] [, data ], handler )
 ### jAwn.on( elements, events [, selector ] [, data ] )
 

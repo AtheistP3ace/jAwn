@@ -1,6 +1,6 @@
 {
   "name": "jawn.js",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "A JavaScript event library for everything jQuery events offers without the jQuery",
   "main": "jAwn.js",
   "scripts": {
